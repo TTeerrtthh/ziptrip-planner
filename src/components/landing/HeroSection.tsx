@@ -34,7 +34,7 @@ export function HeroSection() {
           </p>
 
           {/* CTA Buttons */}
-          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center animate-fade-up" style={{ animationDelay: '0.3s' }}>
+          <div className="flex justify-center animate-fade-up" style={{ animationDelay: '0.3s' }}>
             <Button
               variant="hero"
               size="xl"
@@ -44,26 +44,6 @@ export function HeroSection() {
               Start Planning
               <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
             </Button>
-            <Button
-              variant="hero-outline"
-              size="xl"
-            >
-              Watch Demo
-            </Button>
-          </div>
-
-          {/* Stats */}
-          <div className="flex flex-wrap justify-center gap-8 mt-16 animate-fade-up" style={{ animationDelay: '0.4s' }}>
-            {[
-              { value: '10K+', label: 'Happy Travelers' },
-              { value: '150+', label: 'Destinations' },
-              { value: '4.9', label: 'User Rating' },
-            ].map((stat, index) => (
-              <div key={index} className="text-center">
-                <div className="text-3xl md:text-4xl font-bold text-gradient-primary">{stat.value}</div>
-                <div className="text-sm text-muted-foreground mt-1">{stat.label}</div>
-              </div>
-            ))}
           </div>
         </div>
       </div>
