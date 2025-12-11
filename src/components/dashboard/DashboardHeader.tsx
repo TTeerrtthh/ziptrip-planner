@@ -1,7 +1,17 @@
-import { Link, useLocation } from 'react-router-dom';
-import { Sun, Moon, Globe, Map, Plane, Hotel, Crown, MapPin, Zap } from 'lucide-react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { Sun, Moon, Globe, Map, Plane, Hotel, Crown, MapPin, Zap, LogOut, User } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useTheme } from '@/contexts/ThemeContext';
+import { useAuth } from '@/hooks/useAuth';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { useToast } from '@/hooks/use-toast';
 
 const navItems = [
   { path: '/dashboard', label: 'AI Assistant', icon: Globe },
@@ -14,6 +24,32 @@ const navItems = [
 export function DashboardHeader() {
   const { theme, toggleTheme } = useTheme();
   const location = useLocation();
+  const navigate = useNavigate();
+  const { user, signOut } = useAuth();
+  const { toast } = useToast();
+
+  const handleSignOut = async () => {
+    const { error } = await signOut();
+    if (error) {
+      toast({
+        title: 'Error',
+        description: 'Failed to sign out',
+        variant: 'destructive'
+      });
+    } else {
+      navigate('/');
+    }
+  };
+
+  const getUserInitials = () => {
+    if (user?.user_metadata?.display_name) {
+      return user.user_metadata.display_name.slice(0, 2).toUpperCase();
+    }
+    if (user?.email) {
+      return user.email.slice(0, 2).toUpperCase();
+    }
+    return 'U';
+  };
 
   return (
     <header className="sticky top-0 z-50 glass border-b border-border/50">
@@ -50,25 +86,56 @@ export function DashboardHeader() {
             })}
           </nav>
 
-          {/* Theme Toggle */}
-          <button
-            onClick={toggleTheme}
-            className="p-2.5 rounded-full bg-muted hover:bg-muted/80 transition-all duration-300"
-            aria-label="Toggle theme"
-          >
-            <div className="relative w-5 h-5">
-              <Sun
-                className={`absolute inset-0 w-5 h-5 text-amber transition-all duration-300 ${
-                  theme === 'dark' ? 'opacity-0 rotate-90 scale-0' : 'opacity-100 rotate-0 scale-100'
-                }`}
-              />
-              <Moon
-                className={`absolute inset-0 w-5 h-5 text-sky transition-all duration-300 ${
-                  theme === 'light' ? 'opacity-0 -rotate-90 scale-0' : 'opacity-100 rotate-0 scale-100'
-                }`}
-              />
-            </div>
-          </button>
+          {/* Right side - Theme & User */}
+          <div className="flex items-center gap-2">
+            {/* Theme Toggle */}
+            <button
+              onClick={toggleTheme}
+              className="p-2.5 rounded-full bg-muted hover:bg-muted/80 transition-all duration-300"
+              aria-label="Toggle theme"
+            >
+              <div className="relative w-5 h-5">
+                <Sun
+                  className={`absolute inset-0 w-5 h-5 text-amber transition-all duration-300 ${
+                    theme === 'dark' ? 'opacity-0 rotate-90 scale-0' : 'opacity-100 rotate-0 scale-100'
+                  }`}
+                />
+                <Moon
+                  className={`absolute inset-0 w-5 h-5 text-sky transition-all duration-300 ${
+                    theme === 'light' ? 'opacity-0 -rotate-90 scale-0' : 'opacity-100 rotate-0 scale-100'
+                  }`}
+                />
+              </div>
+            </button>
+
+            {/* User Menu */}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <button className="flex items-center gap-2 p-1 rounded-full hover:bg-muted transition-colors">
+                  <Avatar className="h-8 w-8">
+                    <AvatarFallback className="bg-primary text-primary-foreground text-xs">
+                      {getUserInitials()}
+                    </AvatarFallback>
+                  </Avatar>
+                </button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-48">
+                <div className="px-2 py-1.5">
+                  <p className="text-sm font-medium truncate">
+                    {user?.user_metadata?.display_name || 'Traveler'}
+                  </p>
+                  <p className="text-xs text-muted-foreground truncate">
+                    {user?.email}
+                  </p>
+                </div>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={handleSignOut} className="text-destructive cursor-pointer">
+                  <LogOut className="w-4 h-4 mr-2" />
+                  Sign out
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
         </div>
 
         {/* Mobile Navigation */}
